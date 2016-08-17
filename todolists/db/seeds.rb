@@ -1,32 +1,27 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
+today = Date.today
+two_days_ago = Date.today - 2.days
+three_days_ago = Date.today - 3.days
+dates = [today, two_days_ago, three_days_ago]
+
 User.destroy_all
-Profile.destroy_all
-TodoItem.destroy_all
 TodoList.destroy_all
 
-candidate_list = [ ["Carly", "Fiorina", '1954', 'abc123', 'female'], 
-	["Donald", "Trump", '1946', 'abc123', 'male'],
-		["Ben", "Carson", '1951', 'abc123', 'male'],
-	["Hillary", "Clinton", '1947', 'abc123', 'female']
-]
+100.times { |index| TodoList.create! list_name: "List #{index}", list_due_date: dates.sample }
 
-candidate_list.each do |fName, lName, birthdate, password, gender|
-	user1 = User.create!(username: lName, password_digest: password)
-	profile1 = Profile.create!(gender: gender, birth_year: birthdate, first_name: fName, last_name: lName, user: user1)
-	todolist1 = TodoList.create!(list_name: lName, list_due_date: Date.today + 1.year, user: user1)
-	5.times do |n| 
-		todoitem1 = TodoItem.create!(todo_list: todolist1, completed: true, due_date: todolist1.list_due_date, title: "madeupTitle #{n}", description: "made up description #{n}")
-	end
-     
-	
-
-	
+TodoList.all.each do |list|
+  list.todo_items.create! [
+    { title: "Task 1", due_date: dates.sample, description: "very important task TEST", completed: false },
+    { title: "Task 2", due_date: dates.sample, description: "do something else TEST", completed: true},
+    { title: "Task 3", due_date: dates.sample, description: "learn Action Pack TEST", completed: true}
+  ]
 end
 
-  
+users = User.create! [
+  { username: "jim", password: "abc123" },
+  { username: "rich", password: "123abc" }
+]
+
+TodoList.all.each do |list|
+  list.user = users.sample
+  list.save!
+end
